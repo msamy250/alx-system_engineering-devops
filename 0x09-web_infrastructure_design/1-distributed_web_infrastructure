@@ -1,36 +1,39 @@
-Explanation of Elements:
+Explanation of Infrastructure:
+For Every Additional Element, Why You Are Adding It:
 
 Load Balancer (HAproxy):
+Reason: To distribute incoming traffic across multiple servers to ensure no single server becomes a bottleneck.
+Web Servers (Nginx):
+Reason: To handle HTTP requests and serve static content.
+Application Servers:
+Reason: To process dynamic content and execute application logic.
+Database (MySQL):
+Primary Database on Server 1: To handle write operations and serve as the main data store.
+Replicated Databases on Server 2 and Server 3: To handle read operations and provide redundancy.
+Load Balancer Configuration:
 
-Reason: Distributes incoming traffic across multiple servers to ensure no single server becomes a bottleneck.
-Distribution Algorithm: Round-robin. This algorithm distributes client requests sequentially across the servers.
-Active-Active Setup: Both servers handle traffic simultaneously, improving resource utilization and redundancy.
-Servers:
+Distribution Algorithm: Round-robin.
+How it works: The load balancer distributes client requests sequentially across all servers.
+Active-Active vs. Active-Passive Setup:
 
-Components: Each server contains a web server (Nginx), an application server, a database (MySQL), and the source code.
-Reason: Ensures redundancy and load distribution. If one server fails, the other can handle the load, providing high availability.
-SSL Certificate:
+Active-Active: Both servers handle traffic simultaneously, improving resource utilization and redundancy.
+Active-Passive: One server handles traffic while the other is on standby, taking over only if the active server fails.
+This setup uses Active-Active for the web and application servers, and a Primary-Replica setup for the database.
+Database Primary-Replica (Master-Slave) Cluster:
 
-Reason: Encrypts traffic between the client and server, ensuring data privacy and integrity.
-Role: Enables HTTPS to serve www.foobar.com securely.
-Monitoring Clients (Data Collector for Sumologic):
-
-Reason: Provide real-time monitoring and analytics for the infrastructure.
-Role: Collects data from servers to monitor performance, detect issues, and ensure availability.
-How it collects data: Installed on each server, the client collects logs, metrics, and events, sending them to a central monitoring service like Sumologic.
-Why Each Element is Added:
-
-HTTPS: Encrypts data to secure communication between clients and the website, protecting against eavesdropping and man-in-the-middle attacks.
-Monitoring: Ensures system health by providing visibility into performance, detecting anomalies, and alerting administrators of issues.
-Servers with All Components: Provides redundancy and fault tolerance. Each server is capable of handling all roles, ensuring continuous service availability.
+How it works: The Primary (Master) node on Server 1 handles write operations and replicates data to the Replica (Slave) nodes on Server 2 and Server 3, which handle read operations.
+Difference between Primary and Replica nodes:
+Primary node: Handles both read and write operations.
+Replica nodes: Handle read operations only, receiving updates from the Primary node.
 Issues with This Infrastructure:
+Single Point of Failure (SPOF):
 
-Terminating SSL at the Load Balancer Level:
+Load Balancer: If it fails, the entire system becomes inaccessible.
+Primary Database: If it fails, no write operations can be processed.
+Security Issues:
 
-Issue: SSL termination at the load balancer means traffic between the load balancer and the internal servers is unencrypted, potentially exposing sensitive data.
-Having Only One MySQL Server Capable of Accepting Writes:
+No Firewall: The system is vulnerable to unauthorized access and attacks.
+No HTTPS: Data transmission is not encrypted, exposing it to potential interception.
+No Monitoring:
 
-Issue: This creates a single point of failure and can lead to performance bottlenecks. If the MySQL server fails, the entire database becomes unavailable.
-Servers with All the Same Components:
-
-Issue: This setup can be less efficient in resource usage and scaling. It might also complicate management and updates as all services are tightly coupled on each server.
+Issue: Without monitoring, it's difficult to detect performance issues, downtimes, or security breaches in real-time.

@@ -1,34 +1,33 @@
-Infrastructure Explanation:
+Explanation of Infrastructure:
+For Every Additional Element, Why You Are Adding It:
 
+Load Balancer (HAproxy):
+Reason: To distribute incoming traffic across multiple servers to ensure no single server becomes a bottleneck.
+Web Servers (Nginx):
+Reason: To handle HTTP requests and serve static content.
+Application Servers:
+Reason: To process dynamic content and execute application logic.
+Database (MySQL):
+Primary Database on Server 1: To handle write operations and serve as the main data store.
+Replicated Databases on Server 2 and Server 3: To handle read operations and provide redundancy.
 Firewalls:
 Reason: To protect each server from unauthorized access and potential attacks by filtering incoming and outgoing traffic.
-SSL Certificate:
-Reason: To encrypt data transmitted between the client and the server, ensuring secure communication.
 Monitoring Clients:
 Reason: To collect and analyze performance data, detect issues, and ensure the health and availability of the infrastructure.
-What Are Firewalls For:
+SSL Certificate:
+Reason: To encrypt data transmitted between the client and the server, ensuring secure communication.
+Load Balancer Configuration:
 
-Firewalls are used to control and filter network traffic, protecting servers from unauthorized access, cyber-attacks, and other security threats.
-Why Is the Traffic Served Over HTTPS:
+Distribution Algorithm: Round-robin.
+How it works: The load balancer distributes client requests sequentially across all servers.
+Active-Active vs. Active-Passive Setup:
 
-HTTPS encrypts data transmitted between the client and server, providing data privacy and integrity, and protecting against eavesdropping and man-in-the-middle attacks.
-What Monitoring Is Used For:
+Active-Active: Both servers handle traffic simultaneously, improving resource utilization and redundancy.
+Active-Passive: One server handles traffic while the other is on standby, taking over only if the active server fails.
+This setup uses Active-Active for the web and application servers, and a Primary-Replica setup for the database.
+Database Primary-Replica (Master-Slave) Cluster:
 
-Monitoring is used to track the performance, health, and availability of the infrastructure, detect and diagnose issues, and ensure optimal operation.
-How the Monitoring Tool Is Collecting Data:
-
-Monitoring tools, such as Sumologic, collect data by installing agents on each server. These agents gather logs, metrics, and events, and send this data to a central monitoring service for analysis and visualization.
-Explain What to Do If You Want to Monitor Your Web Server QPS:
-
-To monitor QPS (Queries Per Second), configure the monitoring clients to collect metrics specifically related to web server requests. Use the monitoring service to create dashboards and alerts based on QPS metrics to track and analyze the server's performance.
-Issues with This Infrastructure:
-
-Why Terminating SSL at the Load Balancer Level Is an Issue:
-
-Issue: Terminating SSL at the load balancer means the traffic between the load balancer and internal servers is unencrypted, exposing sensitive data to potential interception within the internal network.
-Why Having Only One MySQL Server Capable of Accepting Writes Is an Issue:
-
-Issue: Having a single MySQL server for write operations creates a single point of failure. If the write-capable MySQL server goes down, the system cannot process write requests, leading to potential data loss and service disruption.
-Why Having Servers with All the Same Components (Database, Web Server, and Application Server) Might Be a Problem:
-
-Issue: This setup lacks specialization and can lead to inefficient resource utilization. It complicates scaling and maintenance because updates or issues in one component can affect the entire server. Additionally, it can create redundancy challenges, making it harder to isolate and manage different services effectively.
+How it works: The Primary (Master) node on Server 1 handles write operations and replicates data to the Replica (Slave) nodes on Server 2 and Server 3, which handle read operations.
+Difference between Primary and Replica nodes:
+Primary node: Handles both read and write operations.
+Replica nodes: Handle read operations only, receiving updates from the Primary node.
