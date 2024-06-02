@@ -1,0 +1,36 @@
+Explanation of Elements:
+
+Load Balancer (HAproxy):
+
+Reason: Distributes incoming traffic across multiple servers to ensure no single server becomes a bottleneck.
+Distribution Algorithm: Round-robin. This algorithm distributes client requests sequentially across the servers.
+Active-Active Setup: Both servers handle traffic simultaneously, improving resource utilization and redundancy.
+Servers:
+
+Components: Each server contains a web server (Nginx), an application server, a database (MySQL), and the source code.
+Reason: Ensures redundancy and load distribution. If one server fails, the other can handle the load, providing high availability.
+SSL Certificate:
+
+Reason: Encrypts traffic between the client and server, ensuring data privacy and integrity.
+Role: Enables HTTPS to serve www.foobar.com securely.
+Monitoring Clients (Data Collector for Sumologic):
+
+Reason: Provide real-time monitoring and analytics for the infrastructure.
+Role: Collects data from servers to monitor performance, detect issues, and ensure availability.
+How it collects data: Installed on each server, the client collects logs, metrics, and events, sending them to a central monitoring service like Sumologic.
+Why Each Element is Added:
+
+HTTPS: Encrypts data to secure communication between clients and the website, protecting against eavesdropping and man-in-the-middle attacks.
+Monitoring: Ensures system health by providing visibility into performance, detecting anomalies, and alerting administrators of issues.
+Servers with All Components: Provides redundancy and fault tolerance. Each server is capable of handling all roles, ensuring continuous service availability.
+Issues with This Infrastructure:
+
+Terminating SSL at the Load Balancer Level:
+
+Issue: SSL termination at the load balancer means traffic between the load balancer and the internal servers is unencrypted, potentially exposing sensitive data.
+Having Only One MySQL Server Capable of Accepting Writes:
+
+Issue: This creates a single point of failure and can lead to performance bottlenecks. If the MySQL server fails, the entire database becomes unavailable.
+Servers with All the Same Components:
+
+Issue: This setup can be less efficient in resource usage and scaling. It might also complicate management and updates as all services are tightly coupled on each server.
